@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+  <head>
+    <title>WebSocket Test Go</title>
+  </head>
+  <body>
+    <h1>WebSocket Test Go Client</h1>
+    <div>
+      <input type="text" id="messageInput" placeholder="Enter message" />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+    <div
+      id="messages"
+      style="
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 300px;
+        overflow-y: auto;
+      "
+    ></div>
+
+    <script>
+      const ws = new WebSocket("ws://" + window.location.host + "/ws");
+      const messagesDiv = document.getElementById("messages");
+
+      ws.onopen = function () {
+        addMessage("Connected to server");
+      };
+
+      ws.onmessage = function (event) {
+        addMessage("Received: " + event.data);
+      };
+
+      ws.onclose = function () {
+        addMessage("Disconnected from server");
+      };
+
+      function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const message = input.value;
+        if (message) {
+          ws.send(message);
+          addMessage("Sent: " + message);
+          input.value = "";
+        }
+      }
+
+      function addMessage(message) {
+        const p = document.createElement("p");
+        p.textContent = message;
+        messagesDiv.appendChild(p);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      document
+        .getElementById("messageInput")
+        .addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+    </script>
+  </body>
+</html>
